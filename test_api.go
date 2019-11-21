@@ -108,9 +108,11 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 	}
 	log.Debugf("Uploading file(%s) to (%s)", configs.AppPath, testAssets.testApp.GcsPath)
 
-	err = uploadFile(testAssets.testApp.UploadURL, configs.AppPath)
-	if err != nil {
-		return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.AppPath, testAssets.testApp.UploadURL, err)
+	if configs.AppPath != "" {
+		err = uploadFile(testAssets.testApp.UploadURL, configs.AppPath)
+		if err != nil {
+			return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.AppPath, testAssets.testApp.UploadURL, err)
+		}
 	}
 
 	if configs.TestType == testTypeInstrumentation {
