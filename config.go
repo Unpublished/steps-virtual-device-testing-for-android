@@ -133,13 +133,6 @@ func (configs *ConfigsModel) validate() error {
 		return fmt.Errorf("- APIBaseURL: required variable is not present")
 	}
 
-	if strings.TrimSpace(configs.AppPath) == "" {
-		return fmt.Errorf("- AppPath: required variable is not present")
-	}
-	if _, err := os.Stat(configs.AppPath); err != nil {
-		return fmt.Errorf("- AppPath: failed to get file info, error: %s", err)
-	}
-
 	if configs.TestType == testTypeInstrumentation {
 		if strings.TrimSpace(configs.TestApkPath) == "" {
 			return fmt.Errorf("- TestApkPath: required variable is not present. Is it possible that you used gradle-runner step and forgot to set `assembleDebugAndroidTest` task?")
