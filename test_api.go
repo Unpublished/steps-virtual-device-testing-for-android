@@ -101,14 +101,14 @@ func uploadTestAssets(configs ConfigsModel) (TestAssetsAndroid, error) {
 		return TestAssetsAndroid{}, fmt.Errorf("failed to unmarshal response body, error: %s", err)
 	}
 
-	if testAssets.isBundle {
-		testAssets.testApp = &testAssets.Aab
-	} else {
-		testAssets.testApp = &testAssets.Apk
-	}
-	log.Debugf("Uploading file(%s) to (%s)", configs.AppPath, testAssets.testApp.GcsPath)
-
 	if configs.AppPath != "" {
+		if testAssets.isBundle {
+			testAssets.testApp = &testAssets.Aab
+		} else {
+			testAssets.testApp = &testAssets.Apk
+		}
+		log.Debugf("Uploading file(%s) to (%s)", configs.AppPath, testAssets.testApp.GcsPath)
+
 		err = uploadFile(testAssets.testApp.UploadURL, configs.AppPath)
 		if err != nil {
 			return TestAssetsAndroid{}, fmt.Errorf("failed to upload file(%s) to (%s), error: %s", configs.AppPath, testAssets.testApp.UploadURL, err)
@@ -183,15 +183,17 @@ func startTestRun(configs ConfigsModel, testAssets TestAssetsAndroid) error {
 	case testTypeInstrumentation:
 		testModel.TestSpecification.AndroidInstrumentationTest = &testing.AndroidInstrumentationTest{}
 
-		if testAssets.isBundle {
-			testModel.TestSpecification.AndroidInstrumentationTest.AppBundle = &testing.AppBundle{
-				BundleLocation: &testing.FileReference{GcsPath: testAssets.testApp.GcsPath},
+		if testAssets.testApp != nil {
+			if testAssets.isBundle {
+				testModel.TestSpecification.AndroidInstrumentationTest.AppBundle = &testing.AppBundle{
+					BundleLocation: &testing.FileReference{GcsPath: testAssets.testApp.GcsPath},
+				}
+			} else {
+				testModel.TestSpecification.AndroidInstrumentationTest.AppApk = &testing.FileReference{GcsPath: testAssets.testApp.GcsPath}
 			}
-		} else {
-			testModel.TestSpecification.AndroidInstrumentationTest.AppApk = &testing.FileReference{GcsPath: testAssets.testApp.GcsPath}
-		}
 
-		testModel.TestSpecification.AndroidInstrumentationTest.TestApk = &testing.FileReference{GcsPath: testAssets.TestApk.GcsPath}
+			testModel.TestSpecification.AndroidInstrumentationTest.TestApk = &testing.FileReference{GcsPath: testAssets.TestApk.GcsPath}
+		}
 		if configs.AppPackageID != "" {
 			testModel.TestSpecification.AndroidInstrumentationTest.AppPackageId = configs.AppPackageID
 		}
