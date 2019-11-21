@@ -32,7 +32,6 @@ inputs:
         The path to the app to test. By default `android-build` step exports `BITRISE_APK_PATH` env, so you won't need to change this input.
 
         Can specify an apk (`$BITRISE_APK_PATH`) or aab bundle as input (`$BITRISE_AAB_PATH`).
-      is_required: true
   - test_devices: "NexusLowRes,24,en,portrait"
     opts:
       title: "Test devices"
